@@ -1,34 +1,158 @@
-# CLAUDE.md — project memory for the SEO Command Center build
+# CLAUDE.md — SEO Command Center Project Memory
 
-This file is your **context / memory for the AI**. Claude Code loads it automatically every
-session. Strong builders engineer this file instead of re-explaining everything in chat — it
-is one of the clearest signals of good practice, and it is graded (see the challenge brief
-section 08). Keep it short, specific, and update it as you learn.
+This file defines the operating context, constraints, and architecture for the Claude Code SEO Command Center plugin.
 
-Replace the prompts below with your own. This is YOUR file.
+It is automatically loaded each session and serves as the **single source of truth for agent behavior**.
 
-## What we are building
-A Claude Code plugin that ingests a Screaming Frog SEO export (`internal_all.csv` + issue
-CSVs), audits it against the rulebook, prioritizes issues, writes fixes, serves a live
-dashboard at localhost:7700, and outputs `outputs/report.json` + `outputs/report.html`.
+---
 
-## Hard rules (the agent must follow these)
-- Detect issues in **plain Python** (csv/pandas). Use the model only for judgment
-  (rewriting titles/metas, choosing redirect targets). Never feed raw crawl rows to the model.
-- `outputs/report.json` MUST match `report.schema.json`. Validate before declaring done.
-- Filter to `text/html` + indexable pages before title/meta checks (see `rulebook.md`).
-- Do not hard-code anything to the sample export — it must work on an unseen export.
-- Keep model calls small and few (free-tier quota). One page per fix call.
+## 🎯 Project Goal
 
-## Architecture (keep it real)
-- `skills/seo-audit/SKILL.md` orchestrates. Sub-agents: ingest, auditor, fixer, reporter.
-- `seo/detector.py` = deterministic detectors (extend to the full rulebook — biggest score).
-- `mcp/server.py` = MCP tools + the live dashboard.
+Build an autonomous SEO Command Center plugin that:
 
-## Conventions
-- Commit after each working step with a real message.
-- Run `python run.py sample-export/` to test end to end.
+- Ingests Screaming Frog export (`internal_all.csv`)
+- Detects SEO issues using deterministic rule engine (rulebook.md)
+- Prioritizes issues by severity and impact
+- Generates AI-assisted fixes (titles, meta descriptions, redirects)
+- Runs a live dashboard at `http://localhost:7700`
+- Outputs:
+  - `outputs/report.json` (strict schema compliant)
+  - `outputs/report.html` (client report)
+  - optional fix artifacts (titles + redirect maps)
 
-## Things I have learned during the build (update this as you go)
-- (e.g. "SF leaves Title 1 blank on redirected URLs — must filter Status Code 200 first")
-- ...
+---
+
+## ⚙️ Core Architecture
+
+### 1. Skill Layer
+- `SKILL.md` orchestrates full pipeline execution
+- Defines workflow: ingest → detect → prioritize → fix → report
+
+### 2. Deterministic Engine (CRITICAL)
+- `seo/detector.py` handles ALL rule-based detection
+- Must implement rulebook strictly using pandas / python logic
+- No LLM usage for detection logic
+
+### 3. MCP Server
+- `mcp/server.py`
+- Hosts:
+  - live dashboard (port 7700)
+  - runtime tools for pipeline execution
+
+### 4. Fix Generator (LLM Layer)
+- Only used for:
+  - rewriting titles
+  - rewriting meta descriptions
+  - selecting redirect targets
+- Must validate outputs before writing
+
+---
+
+## 🚨 Hard Constraints (DO NOT VIOLATE)
+
+- Never send full dataset to the LLM
+- Always filter:
+  - `Content Type == text/html`
+  - `Indexability == Indexable`
+  before SEO checks
+- Every issue must map to real URLs from dataset
+- `report.json` must validate against `report.schema.json`
+- Must work on unseen exports (no hardcoding sample data)
+
+---
+
+## 📊 SEO Detection Rules (High-Level)
+
+Implement all rulebook checks including:
+
+- missing_title
+- duplicate_title
+- title_length violations
+- missing_meta_description
+- duplicate_meta_description
+- missing_h1
+- duplicate_h1
+- thin_content (<200 words)
+- orphan_page (inlinks = 0)
+- non_indexable_but_linked
+- redirect_chain / loop
+- 4xx broken links
+- 5xx server errors
+- slow pages (>1s response)
+
+All detectors must be:
+- deterministic
+- traceable
+- reproducible
+
+---
+
+## 📦 Output Contract
+
+Must always generate:
+
+### report.json
+- schema-compliant
+- includes:
+  - issues[]
+  - severity breakdown
+  - fixes block
+  - recommendations
+
+### report.html
+- client-facing summary
+- issue prioritization
+
+### fix artifacts (champion requirement)
+- titles.csv
+- redirect_map.csv
+
+---
+
+## 🔁 Execution Flow
+
+1. Load CSV (`internal_all.csv`)
+2. Clean + filter dataset
+3. Run deterministic detectors
+4. Aggregate + group issues
+5. Compute severity scoring
+6. Call LLM only for fix generation
+7. Validate outputs
+8. Write:
+   - report.json
+   - report.html
+   - fix files
+9. Stream updates to dashboard
+
+---
+
+## 📌 Engineering Principles
+
+- Determinism > intelligence for detection
+- LLM only for rewriting, never for classification
+- Keep pipeline modular and testable
+- Validate every output before writing
+- Optimize for unseen dataset correctness
+
+---
+
+## 🧠 Known Edge Cases (updated during build)
+
+- Redirected pages may still have missing titles → filter Status Code 200 first
+- Non-indexable pages should be excluded from most checks
+- Duplicate detection must exclude non-HTML pages
+- Pixel width constraints must override character length when both exist
+
+---
+
+## 🏁 Success Criteria
+
+The system is correct only if:
+
+- Works on unseen Screaming Frog export
+- report.json passes schema validation
+- Issue detection matches rulebook precisely
+- No hallucinated URLs or fake issues
+- Dashboard reflects live pipeline state
+
+---
