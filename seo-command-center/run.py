@@ -49,6 +49,7 @@ def main():
     server.seo_report()
     server.seo_export()
 
+    s = server.RUN["summary"]
     # Mirror summary to dashboard and console
     summary_text = (
         f"=== SEO AUDIT RESULT ===\n"
@@ -57,16 +58,13 @@ def main():
         f"Medium {s['by_severity'].get('Medium',0)} / Low {s['by_severity'].get('Low',0)})\n"
         f"Wrote outputs/report.json and outputs/report.html"
     )
-    print(summary_text)
+    print(f"\n{summary_text}")
     server.seo_log(summary_text)
 
-    s = server.RUN["summary"]
-    print("\n=== SEO AUDIT RESULT ===")
-    print(f"Site         : {server.RUN['site']}  ({server.RUN['urls']} URLs)")
-    print(f"Total issues : {s['total_issues']}  (High {s['by_severity'].get('High',0)} / "
-          f"Medium {s['by_severity'].get('Medium',0)} / Low {s['by_severity'].get('Low',0)})")
-    print("Wrote outputs/report.json and outputs/report.html")
-
+    if not args.no_dashboard:
+        print(f"\n🚀 Dashboard is LIVE at http://localhost:{server.PORT}")
+        print("The server is running in the background. Press ENTER to stop the server and exit.")
+        input()
 
 if __name__ == "__main__":
     main()
