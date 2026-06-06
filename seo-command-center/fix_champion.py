@@ -70,15 +70,11 @@ def find_closest_live_page(broken_url, live_pages):
 
     return best_match
 
-def main():
-    parser = argparse.ArgumentParser(description="SEO Fix Champion Stage")
-    parser.add_argument("export_dir", help="Directory containing the Screaming Frog export")
-    args = parser.parse_args()
-
+def run_fixes(export_dir):
     # Path setup
     base_dir = os.path.dirname(os.path.abspath(__file__))
     report_path = os.path.join(base_dir, "outputs", "report.json")
-    csv_path = os.path.join(args.export_dir, "internal_all.csv")
+    csv_path = os.path.join(export_dir, "internal_all.csv")
     out_titles = os.path.join(base_dir, "outputs", "fixes_titles.csv")
     out_redirects = os.path.join(base_dir, "outputs", "redirect_map.csv")
 
@@ -148,10 +144,12 @@ def main():
         writer.writerows(redirect_fixes)
 
     # 3. Update report.json
-    report["fixes"] = {
+    fixes_data = {
         "titles": title_fixes,
         "redirect_map": redirect_fixes
     }
+    report["fixes"] = fixes_data
+
     # Update model calls if LLM was used
     if client:
         report["run_meta"]["model_calls"] += len(title_fixes)
@@ -162,5 +160,10 @@ def main():
     print(f"Success: Fixed {len(title_fixes)} titles and {len(redirect_fixes)} redirects.")
     print(f"Artifacts written to {out_titles} and {out_redirects}")
 
-if __name__ == "__main__":
-    main()
+    return fixes_data
+
+def main():
+    parser = argparse.ArgumentParser(description="SEO Fix Champion Stage")
+    parser.add_argument("export_dir", help="Directory containing the Screaming Frog export")
+    args = parser.parse_args()
+    run_fixes(args.export_dir)

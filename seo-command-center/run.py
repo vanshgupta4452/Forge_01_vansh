@@ -44,6 +44,12 @@ def main():
     if not recs:
         recs.append("No issues detected on this crawl.")
     server.seo_recommend(recs)
+
+    # Trigger Fix Champion Stage
+    import fix_champion
+    fixes = fix_champion.run_fixes(args.export_dir)
+    server.seo_set_fixes(fixes['titles'], fixes['redirect_map'])
+
     server.RUN["model_calls"] = 0  # starter does no model calls; champion fixes will add some
     server.RUN["duration_sec"] = round(time.time() - t0, 1)
     server.seo_report()
