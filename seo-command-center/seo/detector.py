@@ -130,6 +130,13 @@ def detect(rows: list[dict]) -> list[dict]:
         [r["Address"] for r in idx200 if _int(r.get("Inlinks")) == 0],
         "Indexable pages with zero internal links in.")
 
+    # --- Images ---
+    if rows and "Alt Text" in rows[0]:
+        add("missing_image_alt", "Medium",
+            [r["Address"] for r in rows if "image" in (r.get("Content Type", "") or "").lower()
+             and not (r.get("Alt Text", "") or "").strip()],
+            "Images missing alternative text.")
+
     # --- Content & Performance ---
     add("thin_content", "Low",
         [r["Address"] for r in html if indexable(r) and _int(r.get("Word Count")) < 200],
