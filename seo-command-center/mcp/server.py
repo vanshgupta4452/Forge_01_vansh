@@ -38,6 +38,11 @@ def _emit(event, data):
             except Exception: pass
 
 
+def seo_log(message: str) -> dict:
+    _emit("log", message)
+    return {"logged": message}
+
+
 # ----- pipeline tools (importable by run.py without MCP) -----
 def seo_load(export_dir: str) -> dict:
     rows = detector.load_rows(export_dir)
@@ -211,6 +216,11 @@ def _run_mcp():
     def export_report() -> dict:
         """Write outputs/report.html (the client deliverable)."""
         return seo_export()
+
+    @mcp.tool()
+    def log_message(message: str) -> dict:
+        """Log a message to the live dashboard."""
+        return seo_log(message)
 
     mcp.run()
 

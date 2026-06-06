@@ -49,6 +49,17 @@ def main():
     server.seo_report()
     server.seo_export()
 
+    # Mirror summary to dashboard and console
+    summary_text = (
+        f"=== SEO AUDIT RESULT ===\n"
+        f"Site         : {server.RUN['site']}  ({server.RUN['urls']} URLs)\n"
+        f"Total issues : {s['total_issues']}  (High {s['by_severity'].get('High',0)} / "
+        f"Medium {s['by_severity'].get('Medium',0)} / Low {s['by_severity'].get('Low',0)})\n"
+        f"Wrote outputs/report.json and outputs/report.html"
+    )
+    print(summary_text)
+    server.seo_log(summary_text)
+
     s = server.RUN["summary"]
     print("\n=== SEO AUDIT RESULT ===")
     print(f"Site         : {server.RUN['site']}  ({server.RUN['urls']} URLs)")

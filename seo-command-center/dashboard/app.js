@@ -26,6 +26,7 @@ function handle({ event, data }) {
     totals = { High:0, Medium:0, Low:0, total:0 };
   } else if (event === "issue") { addIssue(data); log(`Found ${data.count} × ${data.type}`); }
   else if (event === "summary") { log(`Audit complete: ${data.total_issues} issue types`); }
+  else if (event === "log") { log(data); }
   else if (event === "fixes") { log(`Fixes ready: ${(data.titles||[]).length} titles, ${(data.redirect_map||[]).length} redirects`); }
   else if (event === "exported") { $("export").innerHTML = "<b>report.html written ✓</b><br><span style='color:#c8c5be;font-size:12px'>Open or email outputs/report.html to the client.</span>"; }
   else if (event === "saved") { log("report.json saved"); }
