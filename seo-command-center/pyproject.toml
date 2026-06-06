@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seo-command-center"
+version = "0.1.0"
+description = "Autonomous SEO Command Center for Screaming Frog exports"
+dependencies = [
+    "mcp",
+]
+
+[project.scripts]
+seo-command-center = "seo_command_center.mcp.server:main"

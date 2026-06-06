@@ -2,10 +2,10 @@
   "site": "nmgtechnologies.com",
   "urls_crawled": 456,
   "summary": {
-    "total_issues": 12,
+    "total_issues": 13,
     "by_severity": {
       "High": 2,
-      "Medium": 5,
+      "Medium": 6,
       "Low": 5
     }
   },
@@ -465,6 +465,27 @@
       ],
       "count": 152,
       "explanation": "Slow response pages."
+    },
+    {
+      "type": "canonical_issue",
+      "severity": "Medium",
+      "affected_urls": [
+        "https://nmgtechnologies.com/blog",
+        "https://nmgtechnologies.com/blog/author/nishtha",
+        "https://nmgtechnologies.com/blog/tag/design",
+        "https://nmgtechnologies.com/blog/tag/events",
+        "https://nmgtechnologies.com/blog/tag/events/page/2",
+        "https://nmgtechnologies.com/blog/tag/featured",
+        "https://nmgtechnologies.com/blog/tag/growth",
+        "https://nmgtechnologies.com/blog/tag/marketing",
+        "https://nmgtechnologies.com/blog/tag/mobile",
+        "https://nmgtechnologies.com/blog/tag/outsourcing",
+        "https://nmgtechnologies.com/blog/tag/search-engine-optimization",
+        "https://nmgtechnologies.com/blog/tag/technology",
+        "https://nmgtechnologies.com/blog/tag/web"
+      ],
+      "count": 13,
+      "explanation": "Canonical URL missing or mismatched."
     }
   ],
   "fixes": {

@@ -142,11 +142,8 @@ def detect_redirect_issues(rows, issues):
         elif len(path) > 1:
             chains.extend(path)
 
-    add(issues, "redirect_chain", "High", chains,
-        "Multi-step redirect chain detected.")
-
-    add(issues, "redirect_loop", "High", loops,
-        "Redirect loop detected.")
+    add(issues, "redirect_chain", "High", chains + loops,
+        "Multi-step redirect chain or loop detected.")
 
 
 # ----------------------------
@@ -325,6 +322,17 @@ def detect(rows: list[dict]) -> list[dict]:
         "Low word count pages."
     )
 
+
+    # ---------------- SLOW PAGES ----------------
+
+    add(
+        issues,
+        "slow_page",
+        "Low",
+        [r["Address"] for r in rows if _float(r.get("Response Time")) > 1.0],
+        "Slow response pages."
+    )
+
     # ---------------- IMAGES ----------------
 
     if rows and "Alt Text" in rows[0]:
@@ -337,14 +345,14 @@ def detect(rows: list[dict]) -> list[dict]:
             "Images missing alt text."
         )
 
-    # ---------------- SLOW PAGES ----------------
+    # ---------------- CANONICALS ----------------
 
     add(
         issues,
-        "slow_page",
-        "Low",
-        [r["Address"] for r in rows if _float(r.get("Response Time")) > 1.0],
-        "Slow response pages."
+        "canonical_issue",
+        "Medium",
+        [r["Address"] for r in idx200 if norm(r.get("Canonical Link Element 1")) != norm(r.get("Address"))],
+        "Canonical URL missing or mismatched."
     )
 
     return issues
